@@ -5,6 +5,6 @@ CREATE TABLE messages (
     Message TEXT,
     TimeStamp DATETIME,
     IsRead BOOLEAN DEFAULT 0,
-    FOREIGN KEY (ConversationId) REFERENCES conversations(Id),
-    FOREIGN KEY (SenderId) REFERENCES users(Id)
+    FOREIGN KEY (ConversationId) REFERENCES Conversations(Id),
+    FOREIGN KEY (SenderId) REFERENCES Users(Id)
 );
