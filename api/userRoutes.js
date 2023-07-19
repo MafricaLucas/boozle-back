@@ -89,4 +89,23 @@ router.post('/login', validateLogin, async (req, res) => {
     }
 });
 
+router.get('/search/:pseudo', async (req, res) => {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const { pseudo } = req.params;
+
+        const [rows] = await conn.query(
+            'SELECT id, email, pseudo FROM Users WHERE pseudo LIKE ?',
+            [`%${pseudo}%`]
+        );
+        res.json(rows);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: 'Server error.' });
+    } finally {
+        if (conn) conn.end();
+    }
+});
+
 module.exports = router;
