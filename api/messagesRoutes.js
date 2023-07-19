@@ -10,7 +10,7 @@ router.post('/', async (req, res) => {
         const { conversationId, senderId, message } = req.body;
 
         await conn.query(
-            'INSERT INTO messages (ConversationId, SenderId, Message, TimeStamp, IsRead) VALUES (?, ?, ?, ?, ?)',
+            'INSERT INTO Messages (ConversationId, SenderId, Message, TimeStamp, IsRead) VALUES (?, ?, ?, ?, ?)',
             [conversationId, senderId, message, new Date(), 0]
         );
         res.status(201).json({ message: 'Message sent successfully.' });
@@ -29,7 +29,7 @@ router.get('/:conversationId', async (req, res) => {
         const { conversationId } = req.params;
 
         const [rows] = await conn.query(
-            'SELECT * FROM messages WHERE ConversationId = ? ORDER BY TimeStamp DESC',
+            'SELECT * FROM Messages WHERE ConversationId = ? ORDER BY TimeStamp DESC',
             [conversationId]
         );
         res.json(rows);
@@ -47,7 +47,7 @@ router.put('/:messageId/read', async (req, res) => {
         conn = await pool.getConnection();
         const { messageId } = req.params;
 
-        await conn.query('UPDATE messages SET IsRead = ? WHERE Id = ?', [
+        await conn.query('UPDATE Messages SET IsRead = ? WHERE Id = ?', [
             1,
             messageId
         ]);

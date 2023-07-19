@@ -10,7 +10,7 @@ router.post('/', async (req, res) => {
         const { user1Id, user2Id } = req.body;
 
         await conn.query(
-            'INSERT INTO conversations (User1Id, User2Id) VALUES (?, ?)',
+            'INSERT INTO Conversations (User1Id, User2Id) VALUES (?, ?)',
             [user1Id, user2Id]
         );
         res.status(201).json({ message: 'Conversation created successfully.' });
@@ -29,7 +29,7 @@ router.get('/:userId', async (req, res) => {
         const { userId } = req.params;
 
         const [rows] = await conn.query(
-            'SELECT * FROM conversations WHERE User1Id = ? OR User2Id = ? ORDER BY Id DESC',
+            'SELECT * FROM Conversations WHERE User1Id = ? OR User2Id = ? ORDER BY Id DESC',
             [userId, userId]
         );
         res.json(rows);
