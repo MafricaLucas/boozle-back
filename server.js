@@ -12,7 +12,7 @@ const pool = mariadb.createPool({
 });
 
 const app = express();
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 82;
 
 app.get('/healthcheck', async (req, res) => {
     let conn;
