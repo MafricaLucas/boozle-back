@@ -1,4 +1,4 @@
-CREATE TABLE conversations (
+CREATE TABLE Conversations (
     Id INT AUTO_INCREMENT PRIMARY KEY,
     User1Id INT,
     User2Id INT,

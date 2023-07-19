@@ -1,4 +1,4 @@
-CREATE TABLE messages (
+CREATE TABLE Messages (
     Id INT AUTO_INCREMENT PRIMARY KEY,
     ConversationId INT,
     SenderId INT,
