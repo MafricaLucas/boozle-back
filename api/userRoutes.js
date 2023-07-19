@@ -99,7 +99,7 @@ router.get('/search/:pseudo', async (req, res) => {
             'SELECT id, email, pseudo FROM Users WHERE pseudo LIKE ?',
             [`%${pseudo}%`]
         );
-        res.json(rows[0]);
+        res.json(rows);
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: 'Server error.' });
