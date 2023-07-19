@@ -95,11 +95,11 @@ router.get('/search/:pseudo', async (req, res) => {
         conn = await pool.getConnection();
         const { pseudo } = req.params;
 
-        const [rows] = await conn.query(
-            'SELECT * FROM Users WHERE LOWER(pseudo) LIKE LOWER(?)',
+        const rows = await conn.query(
+            'SELECT id, email, pseudo FROM Users WHERE pseudo LIKE ?',
             [`%${pseudo}%`]
         );
-        res.json(rows);
+        res.json(rows[0]);
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: 'Server error.' });
