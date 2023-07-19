@@ -9,3 +9,11 @@ exports.validateUser = [
         .isLength({ min: 8 })
         .withMessage('Password must be at least 8 characters long.')
 ];
+
+exports.validateLogin = [
+    body('email')
+        .isEmail()
+        .withMessage('Please provide a valid email.')
+        .normalizeEmail(),
+    body('password').exists().withMessage('Password is required.')
+];
