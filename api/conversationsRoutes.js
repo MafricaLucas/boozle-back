@@ -9,7 +9,7 @@ router.post('/', async (req, res) => {
         conn = await pool.getConnection();
         const { user1Id, user2Id } = req.body;
 
-        const [existingConvo] = await conn.query(
+        const existingConvo = await conn.query(
             'SELECT * FROM Conversations WHERE (User1Id = ? AND User2Id = ?) OR (User1Id = ? AND User2Id = ?)',
             [user1Id, user2Id, user2Id, user1Id]
         );
