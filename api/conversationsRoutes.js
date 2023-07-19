@@ -14,7 +14,7 @@ router.post('/', async (req, res) => {
             [user1Id, user2Id, user2Id, user1Id]
         );
 
-        if (existingConvo?.length > 0) {
+        if (existingConvo && existingConvo.length > 0) {
             return res
                 .status(409)
                 .json({ message: 'Conversation already exists.' });
