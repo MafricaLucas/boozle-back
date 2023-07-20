@@ -38,6 +38,7 @@ router.post('/', authenticate, async (req, res) => {
 
 router.get('/', authenticate, async (req, res) => {
     let conn;
+    console.log(req.user);
     try {
         conn = await pool.getConnection();
 
