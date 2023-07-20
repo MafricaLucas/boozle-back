@@ -68,7 +68,7 @@ router.post('/login', validateLogin, async (req, res) => {
         // Check if the provided password matches the one in the database
         const passwordMatch = await bcrypt.compare(
             req.body.password,
-            user[0].password
+            user.password
         );
         if (!passwordMatch) {
             return res
