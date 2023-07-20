@@ -8,6 +8,7 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 const sharp = require('sharp');
+const authenticate = require('../authenticate');
 
 const upload = multer({
     dest: '/images',
