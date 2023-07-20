@@ -82,7 +82,7 @@ router.post('/login', validateLogin, async (req, res) => {
         }
 
         const token = jwt.sign(
-            { id: LoggedUser.id },
+            { id: LoggedUser.Id },
             process.env.PRIVATE_KEY_AUTH,
             {}
         );
