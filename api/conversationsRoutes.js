@@ -9,11 +9,11 @@ router.post('/', authenticate, async (req, res) => {
     let conn;
     try {
         conn = await pool.getConnection();
-        const { user1Id, user2Id } = req.body;
+        const { user2Id } = req.body;
 
         const existingConvo = await conn.query(
             'SELECT * FROM Conversations WHERE (User1Id = ? AND User2Id = ?) OR (User1Id = ? AND User2Id = ?)',
-            [user1Id, user2Id, user2Id, user1Id]
+            [req.user.id, user2Id, user2Id, req.user.id]
         );
 
         if (existingConvo && existingConvo.length > 0) {
@@ -24,7 +24,7 @@ router.post('/', authenticate, async (req, res) => {
 
         await conn.query(
             'INSERT INTO Conversations (User1Id, User2Id) VALUES (?, ?)',
-            [user1Id, user2Id]
+            [req.user.id, user2Id]
         );
 
         res.status(201).json({ message: 'Conversation created successfully.' });
