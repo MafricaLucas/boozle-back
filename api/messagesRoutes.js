@@ -37,7 +37,7 @@ router.get('/:conversationId', authenticate, async (req, res) => {
         conn = await pool.getConnection();
         const { conversationId } = req.params;
 
-        const [rows] = await conn.query(
+        const rows = await conn.query(
             'SELECT * FROM Messages WHERE ConversationId = ? ORDER BY TimeStamp DESC',
             [conversationId]
         );
