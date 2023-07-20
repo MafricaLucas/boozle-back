@@ -13,13 +13,13 @@ router.post('/', authenticate, async (req, res) => {
 
         await conn.query(
             'INSERT INTO Messages (ConversationId, SenderId, Message, TimeStamp, IsRead) VALUES (?, ?, ?, ?, ?)',
-            [conversationId, req.user.id, message, new Date(), 0]
+            [conversationId, req.user.Id, message, new Date(), 0]
         );
 
         // Mark all other unread messages in the conversation as read
         await conn.query(
             'UPDATE Messages SET IsRead = 1 WHERE ConversationId = ? AND SenderId != ? AND IsRead = 0',
-            [conversationId, req.user.id]
+            [conversationId, req.user.Id]
         );
 
         res.status(201).json({ message: 'Message sent successfully.' });
