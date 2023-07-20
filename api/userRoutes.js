@@ -68,15 +68,11 @@ router.post('/login', validateLogin, async (req, res) => {
 
         const LoggedUser = user[0];
 
-        console.log(LoggedUser);
-        console.log(req.body.password);
-        console.log(LoggedUser.password);
         // Check if the provided password matches the one in the database
         const passwordMatch = await bcrypt.compare(
             req.body.password,
-            LoggedUser.password
+            LoggedUser.Password
         );
-        console.log(passwordMatch);
 
         if (!passwordMatch) {
             return res
@@ -91,9 +87,9 @@ router.post('/login', validateLogin, async (req, res) => {
 
         res.json({
             token,
-            id: LoggedUser.id,
-            email: LoggedUser.email,
-            pseudo: LoggedUser.pseudo
+            id: LoggedUser.Id,
+            email: LoggedUser.Email,
+            pseudo: LoggedUser.Pseudo
         });
     } catch (err) {
         console.log(err);
