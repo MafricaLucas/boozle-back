@@ -1,9 +1,10 @@
 const express = require('express');
 const pool = require('../database');
+const authenticate = require('../authenticate');
 
 const router = express.Router();
 
-router.post('/', async (req, res) => {
+router.post('/', authenticate, async (req, res) => {
     let conn;
     try {
         conn = await pool.getConnection();
@@ -34,17 +35,16 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.get('/:userId', async (req, res) => {
+router.get('/', authenticate, async (req, res) => {
     let conn;
     try {
         conn = await pool.getConnection();
-        const { userId } = req.params;
 
-        const [rows] = await conn.query(
-            'SELECT * FROM Conversations WHERE User1Id = ? OR User2Id = ? ORDER BY Id DESC',
-            [userId, userId]
+        const conversations = await conn.query(
+            'SELECT * FROM Conversations WHERE User1Id = ? OR User2Id = ?',
+            [req.user.id, req.user.id]
         );
-        res.json(rows);
+        res.json(conversations);
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: 'Server error.' });

@@ -1,18 +1,26 @@
 const express = require('express');
 const pool = require('../database');
+const authenticate = require('../authenticate');
 
 const router = express.Router();
 
-router.post('/', async (req, res) => {
+router.post('/', authenticate, async (req, res) => {
     let conn;
     try {
         conn = await pool.getConnection();
-        const { conversationId, senderId, message } = req.body;
+        const { conversationId, message } = req.body;
 
         await conn.query(
             'INSERT INTO Messages (ConversationId, SenderId, Message, TimeStamp, IsRead) VALUES (?, ?, ?, ?, ?)',
-            [conversationId, senderId, message, new Date(), 0]
+            [conversationId, req.user.id, message, new Date(), 0]
         );
+
+        // Mark all other unread messages in the conversation as read
+        await conn.query(
+            'UPDATE Messages SET IsRead = 1 WHERE ConversationId = ? AND SenderId != ? AND IsRead = 0',
+            [conversationId, req.user.id]
+        );
+
         res.status(201).json({ message: 'Message sent successfully.' });
     } catch (err) {
         console.log(err);
@@ -22,7 +30,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.get('/:conversationId', async (req, res) => {
+router.get('/:conversationId', authenticate, async (req, res) => {
     let conn;
     try {
         conn = await pool.getConnection();
@@ -41,7 +49,7 @@ router.get('/:conversationId', async (req, res) => {
     }
 });
 
-router.put('/:messageId/read', async (req, res) => {
+router.put('/:messageId/read', authenticate, async (req, res) => {
     let conn;
     try {
         conn = await pool.getConnection();
