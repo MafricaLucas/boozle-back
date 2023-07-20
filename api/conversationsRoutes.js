@@ -41,6 +41,7 @@ router.get('/', authenticate, async (req, res) => {
     try {
         conn = await pool.getConnection();
 
+        console.log(req.user);
         const conversations = await conn.query(
             'SELECT * FROM Conversations WHERE User1Id = ? OR User2Id = ?',
             [req.user.Id, req.user.Id]
