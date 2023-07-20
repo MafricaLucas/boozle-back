@@ -80,6 +80,8 @@ router.post('/login', validateLogin, async (req, res) => {
                 .status(401)
                 .json({ message: 'Invalid email or password.' });
         }
+
+        console.log(process.env.PRIVATE_KEY_AUTH);
         const token = jwt.sign(
             { id: LoggedUser.id },
             process.env.PRIVATE_KEY_AUTH,
