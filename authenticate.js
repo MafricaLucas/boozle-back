@@ -13,7 +13,6 @@ function authenticate(req, res, next) {
             return res.status(401).json({ message: 'Token is invalid.' });
         }
         req.user = user;
-        console.log(req.user);
         next();
     });
 }

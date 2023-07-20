@@ -43,7 +43,7 @@ router.get('/', authenticate, async (req, res) => {
 
         const conversations = await conn.query(
             'SELECT * FROM Conversations WHERE User1Id = ? OR User2Id = ?',
-            [req.user.Id, req.user.Id]
+            [req.user.id, req.user.id]
         );
         res.json(conversations);
     } catch (err) {
