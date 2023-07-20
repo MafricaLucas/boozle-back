@@ -55,11 +55,14 @@ router.post('/login', validateLogin, async (req, res) => {
     try {
         conn = await pool.getConnection();
 
+        console.log(req.body);
         // Find user with the given email
         const [users] = await conn.query(
             'SELECT * FROM Users WHERE email = ?',
             [req.body.email]
         );
+        console.log(users);
+
         if (!users || users.length === 0) {
             return res
                 .status(401)
@@ -68,6 +71,7 @@ router.post('/login', validateLogin, async (req, res) => {
 
         const user = users[0];
 
+        console.log(user);
         // Check if the provided password matches the one in the database
         const passwordMatch = await bcrypt.compare(
             req.body.password,
@@ -78,7 +82,6 @@ router.post('/login', validateLogin, async (req, res) => {
                 .status(401)
                 .json({ message: 'Invalid email or password.' });
         }
-
         const token = jwt.sign(
             { id: user.id },
             process.env.PRIVATE_KEY_AUTH,
