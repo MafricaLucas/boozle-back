@@ -74,6 +74,7 @@ router.get('/unread', authenticate, async (req, res) => {
     try {
         conn = await pool.getConnection();
 
+        console.log(req.user.id);
         const unreadMessages = await conn.query(
             'SELECT Messages.* FROM Messages ' +
                 'JOIN Conversations ON Messages.ConversationId = Conversations.Id ' +
@@ -82,6 +83,7 @@ router.get('/unread', authenticate, async (req, res) => {
                 'ORDER BY Messages.TimeStamp DESC',
             [req.user.id, req.user.id, req.user.id]
         );
+        console.log(unreadMessages);
         res.json(unreadMessages);
     } catch (err) {
         console.log(err);
