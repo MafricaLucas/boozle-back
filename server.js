@@ -6,6 +6,8 @@ const port = process.env.PORT || 82;
 
 app.use(express.json());
 
+app.use('/images', express.static('/images'));
+
 app.use('/', routes);
 
 app.listen(port, () => {

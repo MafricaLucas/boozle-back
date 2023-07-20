@@ -3,5 +3,6 @@ CREATE TABLE Users (
     Email VARCHAR(255) NOT NULL,
     Password VARCHAR(255) NOT NULL,
     Pseudo VARCHAR(255) NOT NULL,
+    ProfileImageUrl VARCHAR(255),
     UNIQUE (Email)
 );
