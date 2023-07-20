@@ -31,6 +31,28 @@ router.post('/', authenticate, async (req, res) => {
     }
 });
 
+router.get('/unread', authenticate, async (req, res) => {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+
+        const unreadMessages = await conn.query(
+            'SELECT Messages.* FROM Messages ' +
+                'JOIN Conversations ON Messages.ConversationId = Conversations.Id ' +
+                'WHERE (Conversations.User1Id = ? OR Conversations.User2Id = ?) ' +
+                'AND Messages.SenderId != ? AND Messages.IsRead = 0 ' +
+                'ORDER BY Messages.TimeStamp DESC',
+            [req.user.id, req.user.id, req.user.id]
+        );
+        res.json(unreadMessages);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: 'Server error.' });
+    } finally {
+        if (conn) conn.end();
+    }
+});
+
 router.get('/:conversationId', authenticate, async (req, res) => {
     let conn;
     try {
@@ -61,30 +83,6 @@ router.put('/:messageId/read', authenticate, async (req, res) => {
             messageId
         ]);
         res.json({ message: 'Message marked as read.' });
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({ message: 'Server error.' });
-    } finally {
-        if (conn) conn.end();
-    }
-});
-
-router.get('/unread', authenticate, async (req, res) => {
-    let conn;
-    try {
-        conn = await pool.getConnection();
-
-        console.log(req.user.id);
-        const unreadMessages = await conn.query(
-            'SELECT Messages.* FROM Messages ' +
-                'JOIN Conversations ON Messages.ConversationId = Conversations.Id ' +
-                'WHERE (Conversations.User1Id = ? OR Conversations.User2Id = ?) ' +
-                'AND Messages.SenderId != ? AND Messages.IsRead = 0 ' +
-                'ORDER BY Messages.TimeStamp DESC',
-            [req.user.id, req.user.id, req.user.id]
-        );
-        console.log(unreadMessages);
-        res.json(unreadMessages);
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: 'Server error.' });
