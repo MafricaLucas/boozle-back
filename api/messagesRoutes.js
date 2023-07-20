@@ -1,6 +1,7 @@
 const express = require('express');
 const pool = require('../database');
 const authenticate = require('../authenticate');
+require('dotenv').config();
 
 const router = express.Router();
 

@@ -3,6 +3,7 @@ const pool = require('../database');
 const bcrypt = require('bcrypt');
 const { validateUser, validateLogin } = require('../validators');
 const { validationResult } = require('express-validator');
+require('dotenv').config();
 
 const router = express.Router();
 
