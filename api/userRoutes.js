@@ -7,19 +7,17 @@ const { validationResult } = require('express-validator');
 const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
+const sharp = require('sharp');
 
 const upload = multer({
     dest: '/images',
+    limits: {
+        fileSize: 5 * 1024 * 1024 // 5MB
+    },
     fileFilter: (req, file, cb) => {
-        // The function should call `cb` with a boolean
-        // to indicate if the file should be accepted
-
-        // To reject this file pass `false`, like so:
         if (!file.mimetype.startsWith('image/')) {
-            return cb(null, false);
+            return cb(null, false, new Error('Not an image'));
         }
-
-        // To accept the file pass `true`, like so:
         cb(null, true);
     }
 });
@@ -148,13 +146,25 @@ router.post(
         let conn;
         try {
             conn = await pool.getConnection();
-
             const { file } = req;
+
             if (!file) {
                 return res.status(400).json({ message: 'No file provided.' });
             }
 
-            const { filename } = file;
+            // resize image and move to correct directory
+            const newFilename = `/images/${file.filename}`;
+            await sharp(file.path)
+                .resize(720, 720, {
+                    fit: 'inside', // maintain aspect ratio
+                    withoutEnlargement: true // avoid enlarging smaller images
+                })
+                .toFile(path.join(__dirname, '../', newFilename)); // path where resized image is saved
+
+            // Delete original uploaded image from tmp directory
+            fs.unlink(file.path, (err) => {
+                if (err) console.log(err);
+            });
 
             // Get the old image url.
             const [user] = await conn.query(
@@ -166,7 +176,7 @@ router.post(
             // Update the user's profile image URL in the database.
             await conn.query(
                 'UPDATE Users SET ProfileImageUrl = ? WHERE Id = ?',
-                [`/images/${filename}`, req.user.id]
+                [newFilename, req.user.id]
             );
 
             // If an old image exists, delete it.
