@@ -6,7 +6,7 @@ COPY package*.json ./
 
 RUN npm install
 
-RUN mkdir -p /app/images
+RUN mkdir -p ./images
 
 COPY . .
 
