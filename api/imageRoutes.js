@@ -46,13 +46,13 @@ router.post(
             }
 
             // resize image and move to correct directory
-            const newFilename = `/app/images/${file.filename}`;
+            const newFilename = `/images/${file.filename}`; // Chemin relatif sans le préfixe '/app/images/'
             await sharp(file.path)
                 .resize(720, 720, {
-                    fit: 'inside', // maintain aspect ratio
-                    withoutEnlargement: true // avoid enlarging smaller images
+                    fit: 'inside',
+                    withoutEnlargement: true
                 })
-                .toFile(newFilename); // path where resized image is saved
+                .toFile(`.${newFilename}`);
 
             // Delete original uploaded image from tmp directory
             fs.unlink(path.join('/app/images', file.path), (err) => {
