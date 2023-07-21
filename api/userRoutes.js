@@ -136,7 +136,7 @@ router.get('/search/:pseudo', async (req, res) => {
         const { pseudo } = req.params;
 
         const rows = await conn.query(
-            'SELECT id, email, pseudo FROM Users WHERE pseudo LIKE ?',
+            'SELECT id, email, pseudo, ProfileImageUrl FROM Users WHERE pseudo LIKE ?',
             [`%${pseudo}%`]
         );
         res.json(rows);
