@@ -147,7 +147,10 @@ router.post(
         let conn;
         try {
             conn = await pool.getConnection();
+            console.log(req);
             const { file } = req;
+
+            console.log(file);
 
             if (!file) {
                 return res.status(400).json({ message: 'No file provided.' });
