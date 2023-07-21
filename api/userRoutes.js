@@ -5,7 +5,6 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const { validateUser, validateLogin } = require('../validators');
 const { validationResult } = require('express-validator');
-const { send } = require('emailjs-com');
 
 require('dotenv').config();
 
@@ -189,27 +188,8 @@ router.post('/reset-password/:token', async (req, res) => {
   });
   
   async function sendResetPasswordEmail(email, token) {
-    try {
-  
-        const userID = 'user_NtKrrw3Hb5xxKB97GoqJT'; // Replace with your emailJS user_id
-        const serviceID = 'service_rryy6qv'; // Replace with your emailJS service_id
-        const templateID = 'template_bx9idst'; // Replace with your emailJS template_id
-        const templateParams = {
-          to_email: email,
-          reset_link: `http://votre_site_web/reset-password/${token}`,
-        };
-        await send(
-            serviceID,
-            templateID,
-            templateParams,
-            userID
-        )
-
-      console.log('E-mail sent successfully.');
-    } catch (error) {
-      console.error('Error sending email:', error);
-      throw error;
-    }
+    console.log(email);
+    console.log(token);
   }
     function generateToken() {
         return new Promise((resolve, reject) => {
