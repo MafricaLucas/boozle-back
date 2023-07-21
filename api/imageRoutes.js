@@ -55,7 +55,7 @@ router.post(
                 .toFile(newFilename); // path where resized image is saved
 
             // Delete original uploaded image from tmp directory
-            fs.unlink(newFilename, (err) => {
+            fs.unlink(path.join('/app/images', file.path), (err) => {
                 if (err) console.log(err);
             });
 
