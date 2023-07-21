@@ -38,6 +38,7 @@ const router = express.Router();
 
 router.post('/register', validateUser, async (req, res) => {
     // Check validation results
+    console.log(req.body);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
