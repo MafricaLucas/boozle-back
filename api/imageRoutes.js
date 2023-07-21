@@ -74,9 +74,9 @@ router.post(
 
             // If an old image exists, delete it.
             if (oldImageUrl) {
-                const oldImagePath = path.join(__dirname, '../', oldImageUrl);
+                const oldImagePath = path.join('/app/images', oldImageUrl);
                 fs.unlink(oldImagePath, (err) => {
-                    if (err) console.log(err);
+                    if (err) console.log('Error deleting file:', err);
                 });
             }
 
