@@ -164,16 +164,16 @@ router.post(
             }
 
             // resize image and move to correct directory
-            const newFilename = `/images/${file.filename}`;
+            const newFilename = `/app/images/${file.filename}`;
             await sharp(file.path)
                 .resize(720, 720, {
                     fit: 'inside', // maintain aspect ratio
                     withoutEnlargement: true // avoid enlarging smaller images
                 })
-                .toFile(path.join(__dirname, '../', newFilename)); // path where resized image is saved
+                .toFile(newFilename); // path where resized image is saved
 
             // Delete original uploaded image from tmp directory
-            fs.unlink(file.path, (err) => {
+            fs.unlink(path.join('/app/images', file.path), (err) => {
                 if (err) console.log(err);
             });
 
