@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const { validateUser, validateLogin } = require('../validators');
 const { validationResult } = require('express-validator');
 const nodemailer = require('nodemailer');
+const emailjs = require('emailjs-com');
 
 require('dotenv').config();
 
@@ -188,40 +189,26 @@ router.post('/reset-password/:token', async (req, res) => {
     }
   });
   
-    async function sendResetPasswordEmail(email, token) {
-        try {
-            // Créer un transporteur pour envoyer l'e-mail (vous devez configurer vos informations de messagerie ici)
-            const transporter = nodemailer.createTransport({
-              service: 'Gmail', // Remplacez par le fournisseur de messagerie de votre choix
-              auth: {
-                user: 'boozleAppContact@gmail.com', // Remplacez par votre adresse e-mail
-                pass: '5Uv6fvyzpbE8' // Remplacez par votre mot de passe
-              }
-            });
-        
-            // Contenu de l'e-mail
-            const mailOptions = {
-              from: 'boozleAppContact@gmail.com', // Adresse e-mail de l'expéditeur
-              to: email, // Adresse e-mail du destinataire
-              subject: 'Réinitialisation de mot de passe', // Objet de l'e-mail
-              html: `
-                <p>Bonjour,</p>
-                <p>Veuillez cliquer sur le lien ci-dessous pour réinitialiser votre mot de passe :</p>
-                <a href="http://votre_site_web/reset-password/${token}">Réinitialiser le mot de passe</a>
-                <p>Ce lien expirera dans 1 heure.</p>
-                <p>Cordialement,</p>
-                <p>Votre équipe de support</p>
-              `
-            };
-        
-            // Envoyer l'e-mail
-            await transporter.sendMail(mailOptions);
-            console.log('E-mail sent successfully.');
-          } catch (error) {
-            console.error('Error sending email:', error);
-            throw error;
-          }
+  async function sendResetPasswordEmail(email, token) {
+    try {
+      const templateParams = {
+        to_email: email,
+        reset_link: `http://votre_site_web/reset-password/${token}`,
+      };
+  
+      const userID = 'user_NtKrrw3Hb5xxKB97GoqJT'; // Replace with your emailJS user_id
+      const serviceID = 'service_rryy6qv'; // Replace with your emailJS service_id
+      const templateID = 'template_bx9idst'; // Replace with your emailJS template_id
+  
+      // Send the email using emailJS
+      await emailjs.send(serviceID, templateID, templateParams, userID);
+  
+      console.log('E-mail sent successfully.');
+    } catch (error) {
+      console.error('Error sending email:', error);
+      throw error;
     }
+  }
     function generateToken() {
         return new Promise((resolve, reject) => {
           crypto.randomBytes(48, function (err, buffer) {
