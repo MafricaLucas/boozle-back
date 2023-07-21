@@ -1,9 +1,11 @@
 const express = require('express');
 const pool = require('../database');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const { validateUser, validateLogin } = require('../validators');
 const { validationResult } = require('express-validator');
+const nodemailer = require('nodemailer');
 
 require('dotenv').config();
 
@@ -121,5 +123,108 @@ router.get('/search/:pseudo', async (req, res) => {
         if (conn) conn.end();
     }
 });
+
+router.post('/forgot-password', async (req, res) => {
+    const { email } = req.body;
+  
+    try {
+      const [user] = await pool.query('SELECT * FROM Users WHERE email = ?', [email]);
+  
+      if (!user) {
+        return res.status(404).json({ message: 'User not found.' });
+      }
+  
+      const token = crypto.randomBytes(48, function(err, buffer) {
+        return buffer.toString('hex');
+      });;
+  
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + 1);
+  
+      // Insert the token into the PasswordResetTokens table with the user's ID and expiration time
+      await pool.query('INSERT INTO PasswordResetTokens (UserId, Token, ExpiresAt) VALUES (?, ?, ?)', [user.Id, token, expiresAt]);
+  
+      sendResetPasswordEmail(email, token);
+  
+      res.json({ message: 'Password reset link sent successfully.' });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ message: 'Server error.' });
+    }
+  });
+
+  // Exemple de code pour la réinitialisation du mot de passe
+router.post('/reset-password/:token', async (req, res) => {
+    const { token } = req.params;
+    const { password } = req.body;
+  
+    try {
+      // Find the token in the PasswordResetTokens table
+      const [tokenRecord] = await pool.query('SELECT * FROM PasswordResetTokens WHERE Token = ?', [token]);
+  
+      if (!tokenRecord) {
+        return res.status(404).json({ message: 'Invalid or expired token.' });
+      }
+  
+      if (tokenRecord.ExpiresAt < new Date()) {
+        // Token has expired
+        return res.status(401).json({ message: 'Token has expired.' });
+      }
+  
+      // Find the user associated with the token
+      const [user] = await pool.query('SELECT * FROM Users WHERE Id = ?', [tokenRecord.UserId]);
+  
+      if (!user) {
+        return res.status(404).json({ message: 'User not found.' });
+      }
+  
+      // Update the user's password in the Users table
+      const hashedPassword = await bcrypt.hash(password, 10);
+      await pool.query('UPDATE Users SET Password = ? WHERE Id = ?', [hashedPassword, user.Id]);
+  
+      // Delete the token from the PasswordResetTokens table
+      await pool.query('DELETE FROM PasswordResetTokens WHERE Token = ?', [token]);
+  
+      res.json({ message: 'Password reset successfully.' });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ message: 'Server error.' });
+    }
+  });
+  
+    async function sendResetPasswordEmail(email, token) {
+        try {
+            // Créer un transporteur pour envoyer l'e-mail (vous devez configurer vos informations de messagerie ici)
+            const transporter = nodemailer.createTransport({
+              service: 'Gmail', // Remplacez par le fournisseur de messagerie de votre choix
+              auth: {
+                user: 'boozleAppContact@gmail.com', // Remplacez par votre adresse e-mail
+                pass: '5Uv6fvyzpbE8' // Remplacez par votre mot de passe
+              }
+            });
+        
+            // Contenu de l'e-mail
+            const mailOptions = {
+              from: 'boozleAppContact@gmail.com', // Adresse e-mail de l'expéditeur
+              to: email, // Adresse e-mail du destinataire
+              subject: 'Réinitialisation de mot de passe', // Objet de l'e-mail
+              html: `
+                <p>Bonjour,</p>
+                <p>Veuillez cliquer sur le lien ci-dessous pour réinitialiser votre mot de passe :</p>
+                <a href="http://votre_site_web/reset-password/${token}">Réinitialiser le mot de passe</a>
+                <p>Ce lien expirera dans 1 heure.</p>
+                <p>Cordialement,</p>
+                <p>Votre équipe de support</p>
+              `
+            };
+        
+            // Envoyer l'e-mail
+            await transporter.sendMail(mailOptions);
+            console.log('E-mail sent successfully.');
+          } catch (error) {
+            console.error('Error sending email:', error);
+            throw error;
+          }
+    }
 
 module.exports = router;
