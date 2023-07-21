@@ -3,5 +3,5 @@ CREATE TABLE PasswordResetToken (
     Token VARCHAR(255) NOT NULL,
     UserId INT,
     TimeStamp DATETIME,
-    FOREIGN KEY (UserId) REFERENCES Users(Id);
+    FOREIGN KEY (UserId) REFERENCES Users(Id)
 );
