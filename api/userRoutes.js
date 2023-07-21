@@ -144,8 +144,7 @@ router.post('/forgot-password', async (req, res) => {
       const expiresAt = new Date();
       expiresAt.setHours(expiresAt.getHours() + 1);
   
-      // Insert the token into the PasswordResetTokens table with the user's ID and expiration time
-      await pool.query('INSERT INTO PasswordResetTokens (UserId, Token, ExpiresAt) VALUES (?, ?, ?)', [user.Id, token, expiresAt]);
+      await pool.query('INSERT INTO PasswordResetToken (UserId, Token, ExpiresAt) VALUES (?, ?, ?)', [user.Id, token, expiresAt]);
   
       sendResetPasswordEmail(email, token);
   
@@ -163,7 +162,7 @@ router.post('/reset-password/:token', async (req, res) => {
   
     try {
       // Find the token in the PasswordResetTokens table
-      const [tokenRecord] = await pool.query('SELECT * FROM PasswordResetTokens WHERE Token = ?', [token]);
+      const [tokenRecord] = await pool.query('SELECT * FROM PasswordResetToken WHERE Token = ?', [token]);
   
       if (!tokenRecord) {
         return res.status(404).json({ message: 'Invalid or expired token.' });
@@ -186,7 +185,7 @@ router.post('/reset-password/:token', async (req, res) => {
       await pool.query('UPDATE Users SET Password = ? WHERE Id = ?', [hashedPassword, user.Id]);
   
       // Delete the token from the PasswordResetTokens table
-      await pool.query('DELETE FROM PasswordResetTokens WHERE Token = ?', [token]);
+      await pool.query('DELETE FROM PasswordResetToken WHERE Token = ?', [token]);
   
       res.json({ message: 'Password reset successfully.' });
     } catch (err) {
