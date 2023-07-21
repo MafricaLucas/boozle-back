@@ -5,7 +5,7 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const { validateUser, validateLogin } = require('../validators');
 const { validationResult } = require('express-validator');
-import { send } from 'emailjs-com';
+const { send } = require('emailjs-com');
 
 require('dotenv').config();
 
