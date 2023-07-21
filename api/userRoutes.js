@@ -133,10 +133,13 @@ router.post('/forgot-password', async (req, res) => {
       if (!user) {
         return res.status(404).json({ message: 'User not found.' });
       }
-  
-      const token = crypto.randomBytes(48, function(err, buffer) {
-        return buffer.toString('hex');
-      });;
+      const token = generateToken((err, token) => {
+        if (err) {
+          console.error('Error generating token:', err);
+        } else {
+            return token;
+        }
+      });
   
       const expiresAt = new Date();
       expiresAt.setHours(expiresAt.getHours() + 1);
@@ -226,5 +229,15 @@ router.post('/reset-password/:token', async (req, res) => {
             throw error;
           }
     }
+    function generateToken(callback) {
+        crypto.randomBytes(48, function (err, buffer) {
+          if (err) {
+            callback(err, null);
+          } else {
+            const token = buffer.toString('hex');
+            callback(null, token);
+          }
+        });
+      }
 
 module.exports = router;
