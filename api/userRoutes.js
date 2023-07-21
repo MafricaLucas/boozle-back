@@ -10,6 +10,15 @@ const path = require('path');
 const sharp = require('sharp');
 const authenticate = require('../authenticate');
 
+function multerErrorHandling(err, req, res, next) {
+    if (err instanceof multer.MulterError) {
+        res.status(500).send({ message: `Multer error: ${err.message}` });
+    } else if (err) {
+        res.status(500).send({ message: `General error: ${err.message}` });
+    }
+    next(err);
+}
+
 const upload = multer({
     dest: '/images',
     limits: {
@@ -143,6 +152,7 @@ router.post(
     '/profileImage',
     authenticate,
     upload.single('image'),
+    multerErrorHandling,
     async (req, res) => {
         let conn;
         try {
