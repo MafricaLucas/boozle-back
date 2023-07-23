@@ -7,7 +7,6 @@ const { validateUser, validateLogin } = require('../validators');
 const { validationResult } = require('express-validator');
 const nodemailer = require('nodemailer');
 const { google } = require("googleapis");
-const OAuth2 = google.auth.OAuth2;
 
 require('dotenv').config();
 
@@ -193,15 +192,20 @@ router.post('/reset-password/:token', async (req, res) => {
 
 
   async function sendResetPasswordEmail(email, tokenMail) {
+    const OAuth2 = google.auth.OAuth2;
     const oauth2Client = new OAuth2(
       "392643971977-nlrp1bjmfuiolapkb8q3va3fjnet8vsu.apps.googleusercontent.com", // ClientID
       "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", // Client Secret
       "https://developers.google.com/oauthplayground" // Redirect URL
     );
     
+    console.log('-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_');
+    console.log(oauth2Client);
     oauth2Client.setCredentials({
       refresh_token: "1//04U_ANSsYz4tRCgYIARAAGAQSNwF-L9Ir-MdV3ukIGMxgQOK2EkW1Cfr8JjwoHIPcAYkdfV1ZP7Awyf2sMiJ4XR5BR1krKnILCBA"
     });
+    console.log('------------------------------');
+    console.log(oauth2Client);
   
     try {
       const { token } = await oauth2Client.getAccessToken();
