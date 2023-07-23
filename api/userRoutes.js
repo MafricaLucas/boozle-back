@@ -6,6 +6,8 @@ const jwt = require('jsonwebtoken');
 const { validateUser, validateLogin } = require('../validators');
 const { validationResult } = require('express-validator');
 const nodemailer = require('nodemailer');
+const { google } = require("googleapis");
+const OAuth2 = google.auth.OAuth2;
 
 require('dotenv').config();
 
@@ -188,19 +190,33 @@ router.post('/reset-password/:token', async (req, res) => {
     }
   });
   
-  async function sendResetPasswordEmail(email, token) {
 
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
+
+  async function sendResetPasswordEmail(email, token) {
+    const oauth2Client = new OAuth2(
+      "392643971977-nlrp1bjmfuiolapkb8q3va3fjnet8vsu.apps.googleusercontent.com", // ClientID
+      "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", // Client Secret
+      "https://developers.google.com/oauthplayground" // Redirect URL
+    );
+    
+    oauth2Client.setCredentials({
+      refresh_token: "1//04U_ANSsYz4tRCgYIARAAGAQSNwF-L9Ir-MdV3ukIGMxgQOK2EkW1Cfr8JjwoHIPcAYkdfV1ZP7Awyf2sMiJ4XR5BR1krKnILCBA"
+    });
+  
+    
+  const accessToken = oauth2Client.getAccessToken()
+    const smtpTransport = nodemailer.createTransport({
+      service: "gmail",
       auth: {
-          type: 'OAuth2',
-          user: 'boozleappcontact@gmail.com',
+          type: "OAuth2",
+          user: "boozleappcontact@gmail.com", 
           clientId: '392643971977-nlrp1bjmfuiolapkb8q3va3fjnet8vsu.apps.googleusercontent.com',
           clientSecret: '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',
           refreshToken: '1//04U_ANSsYz4tRCgYIARAAGAQSNwF-L9Ir-MdV3ukIGMxgQOK2EkW1Cfr8JjwoHIPcAYkdfV1ZP7Awyf2sMiJ4XR5BR1krKnILCBA',
-          accessToken: 'ya29.a0AbVbY6NStwX9T9SdyZRI281Itb2tzU2LNhoMRN-AjBocDbSfBFwG0E-B2CCy1ZfvPF84cJCAjTdHbbqXzDz_PVjFNktoPkWPdHRaY-x2XOBmKxjJgG-14Mg6xr3UfkHw2ETYT76vI_kmP_UEOBNiCkEOH6MnCdkaCgYKAQcSARESFQFWKvPlY_mj_i5vUzbJYZjvezT6kQ0166'
-      },
+          accessToken: accessToken 
+      }
   });
+
   const mailOptions = {
     from: 'boozleappcontact@gmail.com',
     to: email, 
