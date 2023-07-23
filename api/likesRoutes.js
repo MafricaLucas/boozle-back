@@ -59,7 +59,7 @@ router.get('/', authenticate, async (req, res) => {
         const userId = req.user.id;
 
         // Get the likes from the database
-        const [likes] = await pool.query('SELECT * FROM Likes WHERE UserId = ?', [userId]);
+        const likes = await pool.query('SELECT * FROM Likes WHERE UserId = ?', [userId]);
 
         res.json({ message: 'Likes fetched successfully.', likes });
     } catch (err) {
