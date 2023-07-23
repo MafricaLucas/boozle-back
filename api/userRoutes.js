@@ -206,6 +206,8 @@ router.post('/reset-password/:token', async (req, res) => {
     try {
       const { token } = await oauth2Client.getAccessToken();
       
+      console.log('------------------------------');
+      console.log(token);
       const smtpTransport = nodemailer.createTransport({
         service: "gmail",
         auth: {
@@ -218,6 +220,8 @@ router.post('/reset-password/:token', async (req, res) => {
         }
     });
   
+    console.log('___________________________________');
+    console.log(smtpTransport);
     const mailOptions = {
       from: 'boozleappcontact@gmail.com',
       to: email, 
@@ -239,7 +243,7 @@ router.post('/reset-password/:token', async (req, res) => {
           else
             console.log(info);
       });
-      
+
     } catch (error) {
       console.error('Erreur lors de l\'obtention du token d\'accès:', error);
     }
