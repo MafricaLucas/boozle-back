@@ -191,37 +191,23 @@ router.post('/reset-password/:token', async (req, res) => {
   });
   
 
-
   async function sendResetPasswordEmail(email, tokenMail) {
-    const oauth2Client = new OAuth2(
-      "392643971977-n41mmfqjajvt7kr09osprmcvk7vp9str.apps.googleusercontent.com", // ClientID
-      "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", // Client Secret
-      "https://developers.google.com/oauthplayground" // Redirect URL
-    );
-    
-    oauth2Client.setCredentials({
-      refresh_token: "1//04U_ANSsYz4tRCgYIARAAGAQSNwF-L9Ir-MdV3ukIGMxgQOK2EkW1Cfr8JjwoHIPcAYkdfV1ZP7Awyf2sMiJ4XR5BR1krKnILCBA"
+    let transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        type: 'OAuth2',
+        user: "boozleappcontact@gmail.com", //process.env.GMAIL_USER
+        clientId: "392643971977-n41mmfqjajvt7kr09osprmcvk7vp9str.apps.googleusercontent.com", // process.env.OAUTH_CLIENT_ID,
+        clientSecret: "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", //process.env.OAUTH_CLIENT_SECRET,
+        refreshToken: "4/0AZEOvhWd-TsNeKoRGGLpZ_ePcAkwU3k1cjbc-GiwsAUAh42ejRUAInSy2n8eSCMKfxxQew", //process.env.OAUTH_REFRESH_TOKEN,
+      },
     });
   
-    
-  const {token} = oauth2Client.getAccessToken();
-    const smtpTransport = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-          type: "OAuth2",
-          user: "boozleappcontact@gmail.com", 
-          clientId: '392643971977-n41mmfqjajvt7kr09osprmcvk7vp9str.apps.googleusercontent.com',
-          clientSecret: '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',
-          refreshToken: '1//04U_ANSsYz4tRCgYIARAAGAQSNwF-L9Ir-MdV3ukIGMxgQOK2EkW1Cfr8JjwoHIPcAYkdfV1ZP7Awyf2sMiJ4XR5BR1krKnILCBA',
-          accessToken: token 
-      }
-  });
-
-  const mailOptions = {
-    from: 'boozleappcontact@gmail.com',
-    to: email, 
-    subject: 'Password Reset', // Subject line
-    html: `
+    let mailOptions = {
+      from: "boozleappcontact@gmail.com", //process.env.GMAIL_USER
+      to: email,
+      subject: 'Réinitialisation du mot de passe',
+      html: `
                 <p>Bonjour,</p>
                 <p>Veuillez cliquer sur le lien ci-dessous pour réinitialiser votre mot de passe :</p>
                 <a href="http://votre_site_web/reset-password/${tokenMail}">Réinitialiser le mot de passe</a>
@@ -229,16 +215,16 @@ router.post('/reset-password/:token', async (req, res) => {
                 <p>Cordialement,</p>
                 <p>Votre équipe de support</p>
             `,
-};
-
-smtpTransport.sendMail(mailOptions, function (err, info) {
-    if(err)
-      console.log(err)
-    else
-      console.log(info);
-});
-
+    };
+  
+    try {
+      let info = await transporter.sendMail(mailOptions);
+      console.log(`Message sent: ${info.messageId}`);
+    } catch (error) {
+      console.log(`Error occurred. ${error.message}`);
+    }
   }
+
     function generateToken() {
         return new Promise((resolve, reject) => {
           crypto.randomBytes(48, function (err, buffer) {
