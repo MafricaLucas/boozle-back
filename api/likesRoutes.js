@@ -60,8 +60,9 @@ router.get('/', authenticate, async (req, res) => {
 
         // Get the likes from the database
         const likes = await pool.query('SELECT GameId FROM Likes WHERE UserId = ?', [userId]);
+        const likesArray = likes.map(like => like.GameId);
 
-        res.json({ message: 'Likes fetched successfully.', likes });
+        res.json({ message: 'Likes fetched successfully.', likes: likesArray });
     } catch (err) {
         console.error('Error fetching likes:', err);
         res.status(500).json({ message: 'Server error.' });
