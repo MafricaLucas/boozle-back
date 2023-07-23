@@ -7,7 +7,7 @@ const { validateUser, validateLogin } = require('../validators');
 const { validationResult } = require('express-validator');
 const nodemailer = require('nodemailer');
 const { google } = require("googleapis");
-const OAuth2 = google.auth.OAuth2;
+const { OAuth2Client } = require('google-auth-library');
 
 require('dotenv').config();
 
@@ -192,6 +192,14 @@ router.post('/reset-password/:token', async (req, res) => {
   
 
   async function sendResetPasswordEmail(email, tokenMail) {
+    
+    const oauth2Client = new OAuth2Client(
+      "392643971977-n41mmfqjajvt7kr09osprmcvk7vp9str.apps.googleusercontent.com",
+      "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",
+      'https://developers.google.com/oauthplayground'
+    );
+
+    const { tokens } = await oauth2Client.getToken("4/0AZEOvhWd-TsNeKoRGGLpZ_ePcAkwU3k1cjbc-GiwsAUAh42ejRUAInSy2n8eSCMKfxxQew");
     let transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -199,9 +207,11 @@ router.post('/reset-password/:token', async (req, res) => {
         user: "boozleappcontact@gmail.com", //process.env.GMAIL_USER
         clientId: "392643971977-n41mmfqjajvt7kr09osprmcvk7vp9str.apps.googleusercontent.com", // process.env.OAUTH_CLIENT_ID,
         clientSecret: "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", //process.env.OAUTH_CLIENT_SECRET,
-        refreshToken: "4/0AZEOvhWd-TsNeKoRGGLpZ_ePcAkwU3k1cjbc-GiwsAUAh42ejRUAInSy2n8eSCMKfxxQew", //process.env.OAUTH_REFRESH_TOKEN,
+        refreshToken: tokens, //process.env.OAUTH_REFRESH_TOKEN,
       },
     });
+
+    
   
     let mailOptions = {
       from: "boozleappcontact@gmail.com", //process.env.GMAIL_USER
