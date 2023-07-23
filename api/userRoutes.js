@@ -231,7 +231,7 @@ router.post('/reset-password/:token', async (req, res) => {
             `,
 };
 
-transporter.sendMail(mailOptions, function (err, info) {
+smtpTransport.sendMail(mailOptions, function (err, info) {
     if(err)
       console.log(err)
     else
