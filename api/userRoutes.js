@@ -194,11 +194,10 @@ router.post('/reset-password/:token', async (req, res) => {
       service: 'gmail',
       auth: {
           type: 'OAuth2',
-          user: 'boozleappcontact@gmail.com',
-          clientId: '392643971977-n41mmfqjajvt7kr09osprmcvk7vp9str.apps.googleusercontent.com',
-          clientSecret: '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',
-          refreshToken: '1//04FHC9uFFx_BSCgYIARAAGAQSNwF-L9IrFGoLs8UYAJJZseEN3U1IwA9eH2ugeeQSzaWwfJA4QpEVzUHDcfkFMG7b5zo05sej5tI',
-          accessToken: 'ya29.a0AbVbY6MgI_XbVUD9UnuP4s6M2yc3gDZcvSlwWJL-0CzN31PLcFOZoDdp_eZbO-3neJggYKAgZMFL9J0GkVYbLAJnWhiJFBUvlkHkExyE84lhmHM9pHKcojuKR5TMD8_SD7Bzr0ngofKbN6Hb3GgSz1XNxiSdaCgYKASASARESFQFWKvPltMRx1yXjx904ARZqsdcOyQ0163',
+          user: process.env.USER_GMAIL,
+          clientId: process.env.CLIENT_ID,
+          clientSecret: process.env.CLIENT_SECRET,
+          refreshToken: process.env.CLIENT_REFRESH_TOKEN,
       },
   });
   const mailOptions = {
