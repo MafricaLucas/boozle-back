@@ -201,7 +201,7 @@ router.post('/reset-password/:token', async (req, res) => {
       },
   });
   const mailOptions = {
-    from: 'boozleappcontact@gmail.com',
+    from: process.env.USER_GMAIL,
     to: email, 
     subject: 'Password Reset', // Subject line
     html: `
