@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const { validateUser, validateLogin } = require('../validators');
 const { validationResult } = require('express-validator');
+const nodemailer = require('nodemailer');
 
 require('dotenv').config();
 
@@ -188,8 +189,39 @@ router.post('/reset-password/:token', async (req, res) => {
   });
   
   async function sendResetPasswordEmail(email, token) {
-    console.log(email);
-    console.log(token);
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+          type: 'OAuth2',
+          user: 'boozleappcontact@gmail.com',
+          clientId: '392643971977-nlrp1bjmfuiolapkb8q3va3fjnet8vsu.apps.googleusercontent.com',
+          clientSecret: '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',
+          refreshToken: '1//04U_ANSsYz4tRCgYIARAAGAQSNwF-L9Ir-MdV3ukIGMxgQOK2EkW1Cfr8JjwoHIPcAYkdfV1ZP7Awyf2sMiJ4XR5BR1krKnILCBA',
+          accessToken: 'ya29.a0AbVbY6NStwX9T9SdyZRI281Itb2tzU2LNhoMRN-AjBocDbSfBFwG0E-B2CCy1ZfvPF84cJCAjTdHbbqXzDz_PVjFNktoPkWPdHRaY-x2XOBmKxjJgG-14Mg6xr3UfkHw2ETYT76vI_kmP_UEOBNiCkEOH6MnCdkaCgYKAQcSARESFQFWKvPlY_mj_i5vUzbJYZjvezT6kQ0166'
+      },
+  });
+  const mailOptions = {
+    from: 'boozleappcontact@gmail.com',
+    to: email, 
+    subject: 'Password Reset', // Subject line
+    html: `
+                <p>Bonjour,</p>
+                <p>Veuillez cliquer sur le lien ci-dessous pour réinitialiser votre mot de passe :</p>
+                <a href="http://votre_site_web/reset-password/${token}">Réinitialiser le mot de passe</a>
+                <p>Ce lien expirera dans 1 heure.</p>
+                <p>Cordialement,</p>
+                <p>Votre équipe de support</p>
+            `,
+};
+
+transporter.sendMail(mailOptions, function (err, info) {
+    if(err)
+      console.log(err)
+    else
+      console.log(info);
+});
+
   }
     function generateToken() {
         return new Promise((resolve, reject) => {

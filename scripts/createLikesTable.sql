@@ -1,0 +1,6 @@
+CREATE TABLE Likes (
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    UserId INT,
+    GameId INT,
+    FOREIGN KEY (UserId) REFERENCES Users(Id)
+);
