@@ -199,13 +199,18 @@ router.post('/reset-password/:token', async (req, res) => {
       "https://developers.google.com/oauthplayground" // Redirect URL
     );
     
+    console.log('oauth2Client', oauth2Client);
     oauth2Client.setCredentials({
       refresh_token: "1//04U_ANSsYz4tRCgYIARAAGAQSNwF-L9Ir-MdV3ukIGMxgQOK2EkW1Cfr8JjwoHIPcAYkdfV1ZP7Awyf2sMiJ4XR5BR1krKnILCBA"
     });
+    console.log('oauth2Client', oauth2Client);
   
     
-  const accessToken = oauth2Client.getAccessToken()
-    const smtpTransport = nodemailer.createTransport({
+  const accessToken = oauth2Client.getAccessToken();
+  
+  console.log('accessToken', accessToken);
+
+  const smtpTransport = nodemailer.createTransport({
       service: "gmail",
       auth: {
           type: "OAuth2",
@@ -216,6 +221,7 @@ router.post('/reset-password/:token', async (req, res) => {
           accessToken: accessToken 
       }
   });
+  console.log('smtpTransport', smtpTransport);
 
   const mailOptions = {
     from: 'boozleappcontact@gmail.com',
@@ -231,12 +237,13 @@ router.post('/reset-password/:token', async (req, res) => {
             `,
 };
 
-smtpTransport.sendMail(mailOptions, function (err, info) {
-    if(err)
-      console.log(err)
-    else
-      console.log(info);
-});
+console.log('mailOptions', mailOptions);
+    smtpTransport.sendMail(mailOptions, function (err, info) {
+        if(err)
+          console.log(err)
+        else
+          console.log(info);
+    });
 
   }
     function generateToken() {
