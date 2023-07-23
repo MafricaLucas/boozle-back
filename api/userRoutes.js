@@ -194,15 +194,15 @@ router.post('/reset-password/:token', async (req, res) => {
   async function sendResetPasswordEmail(email, tokenMail) {
     const OAuth2 = google.auth.OAuth2;
     const oauth2Client = new OAuth2(
-      "392643971977-nlrp1bjmfuiolapkb8q3va3fjnet8vsu.apps.googleusercontent.com", // ClientID
-      "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", // Client Secret
+      "392643971977-n41mmfqjajvt7kr09osprmcvk7vp9str.apps.googleusercontent.com", // ClientID
+      "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", // Client Secret
       "https://developers.google.com/oauthplayground" // Redirect URL
     );
     
     console.log('-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_');
     console.log(oauth2Client);
     oauth2Client.setCredentials({
-      refresh_token: "1//04U_ANSsYz4tRCgYIARAAGAQSNwF-L9Ir-MdV3ukIGMxgQOK2EkW1Cfr8JjwoHIPcAYkdfV1ZP7Awyf2sMiJ4XR5BR1krKnILCBA"
+      refresh_token: "1//043TkqAmXm3VLCgYIARAAGAQSNwF-L9IrcusykLxhHYW_vbNCm_9qCkLX4wIdaedNDhktGYLwIH7bvawSZ1lqOasOJLbnj0kfTJ4"
     });
     console.log('------------------------------');
     console.log(oauth2Client);
@@ -217,9 +217,9 @@ router.post('/reset-password/:token', async (req, res) => {
         auth: {
             type: "OAuth2",
             user: "boozleappcontact@gmail.com", 
-            clientId: '392643971977-nlrp1bjmfuiolapkb8q3va3fjnet8vsu.apps.googleusercontent.com',
-            clientSecret: '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',
-            refreshToken: '1//04U_ANSsYz4tRCgYIARAAGAQSNwF-L9Ir-MdV3ukIGMxgQOK2EkW1Cfr8JjwoHIPcAYkdfV1ZP7Awyf2sMiJ4XR5BR1krKnILCBA',
+            clientId: '392643971977-n41mmfqjajvt7kr09osprmcvk7vp9str.apps.googleusercontent.com',
+            clientSecret: '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',
+            refreshToken: '1//043TkqAmXm3VLCgYIARAAGAQSNwF-L9IrcusykLxhHYW_vbNCm_9qCkLX4wIdaedNDhktGYLwIH7bvawSZ1lqOasOJLbnj0kfTJ4',
             accessToken: token 
         }
     });
