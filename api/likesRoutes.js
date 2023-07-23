@@ -31,7 +31,7 @@ router.post('/add', authenticate, async (req, res) => {
 
 router.post('/remove', authenticate, async (req, res) => {
     try {
-        const userId = req.user.id; // Assuming you have the user ID available from the authentication middleware
+        const userId = req.user.id;
         const { gameId } = req.body;
 
         // Check if the user has liked the game
@@ -54,4 +54,17 @@ router.post('/remove', authenticate, async (req, res) => {
     }
 });
 
+router.get('/', authenticate, async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        // Get the likes from the database
+        const [likes] = await pool.query('SELECT * FROM Likes WHERE UserId = ?', [userId]);
+
+        res.json({ message: 'Likes fetched successfully.', likes });
+    } catch (err) {
+        console.error('Error fetching likes:', err);
+        res.status(500).json({ message: 'Server error.' });
+    }
+});
 module.exports = router;
