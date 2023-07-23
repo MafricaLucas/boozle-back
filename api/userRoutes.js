@@ -192,23 +192,19 @@ router.post('/reset-password/:token', async (req, res) => {
   
 
 
-  async function sendResetPasswordEmail(email, token) {
+  async function sendResetPasswordEmail(email, tokenMail) {
     const oauth2Client = new OAuth2(
       "392643971977-nlrp1bjmfuiolapkb8q3va3fjnet8vsu.apps.googleusercontent.com", // ClientID
       "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", // Client Secret
       "https://developers.google.com/oauthplayground" // Redirect URL
     );
     
-    console.log('oauth2Client', oauth2Client);
     oauth2Client.setCredentials({
       refresh_token: "1//04U_ANSsYz4tRCgYIARAAGAQSNwF-L9Ir-MdV3ukIGMxgQOK2EkW1Cfr8JjwoHIPcAYkdfV1ZP7Awyf2sMiJ4XR5BR1krKnILCBA"
     });
-    console.log('oauth2Client', oauth2Client);
   
     
-  const accessToken = oauth2Client.getAccessToken();
-  
-  console.log('accessToken', accessToken);
+  const { token } = await oauth2Client.getAccessToken();
 
   const smtpTransport = nodemailer.createTransport({
       service: "gmail",
@@ -218,10 +214,9 @@ router.post('/reset-password/:token', async (req, res) => {
           clientId: '392643971977-nlrp1bjmfuiolapkb8q3va3fjnet8vsu.apps.googleusercontent.com',
           clientSecret: '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',
           refreshToken: '1//04U_ANSsYz4tRCgYIARAAGAQSNwF-L9Ir-MdV3ukIGMxgQOK2EkW1Cfr8JjwoHIPcAYkdfV1ZP7Awyf2sMiJ4XR5BR1krKnILCBA',
-          accessToken: accessToken 
+          accessToken: token 
       }
   });
-  console.log('smtpTransport', smtpTransport);
 
   const mailOptions = {
     from: 'boozleappcontact@gmail.com',
@@ -230,7 +225,7 @@ router.post('/reset-password/:token', async (req, res) => {
     html: `
                 <p>Bonjour,</p>
                 <p>Veuillez cliquer sur le lien ci-dessous pour réinitialiser votre mot de passe :</p>
-                <a href="http://votre_site_web/reset-password/${token}">Réinitialiser le mot de passe</a>
+                <a href="http://votre_site_web/reset-password/${tokenMail}">Réinitialiser le mot de passe</a>
                 <p>Ce lien expirera dans 1 heure.</p>
                 <p>Cordialement,</p>
                 <p>Votre équipe de support</p>
