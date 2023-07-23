@@ -6,8 +6,6 @@ const jwt = require('jsonwebtoken');
 const { validateUser, validateLogin } = require('../validators');
 const { validationResult } = require('express-validator');
 const nodemailer = require('nodemailer');
-const { google } = require("googleapis");
-const { OAuth2Client } = require('google-auth-library');
 
 require('dotenv').config();
 
@@ -190,51 +188,41 @@ router.post('/reset-password/:token', async (req, res) => {
     }
   });
   
+  async function sendResetPasswordEmail(email, token) {
 
-  async function sendResetPasswordEmail(email, tokenMail) {
-    
-    const oauth2Client = new OAuth2Client(
-      "392643971977-n41mmfqjajvt7kr09osprmcvk7vp9str.apps.googleusercontent.com",
-      "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",
-      'https://developers.google.com/oauthplayground'
-    );
-
-    const { tokens } = await oauth2Client.getToken("4/0AZEOvhWd-TsNeKoRGGLpZ_ePcAkwU3k1cjbc-GiwsAUAh42ejRUAInSy2n8eSCMKfxxQew");
-    let transporter = nodemailer.createTransport({
+    const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        type: 'OAuth2',
-        user: "boozleappcontact@gmail.com", //process.env.GMAIL_USER
-        clientId: "392643971977-n41mmfqjajvt7kr09osprmcvk7vp9str.apps.googleusercontent.com", // process.env.OAUTH_CLIENT_ID,
-        clientSecret: "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", //process.env.OAUTH_CLIENT_SECRET,
-        refreshToken: tokens, //process.env.OAUTH_REFRESH_TOKEN,
+          type: 'OAuth2',
+          user: 'boozleappcontact@gmail.com',
+          clientId: '392643971977-n41mmfqjajvt7kr09osprmcvk7vp9str.apps.googleusercontent.com',
+          clientSecret: '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',
+          refreshToken: '1//04s2etyIqvYmMCgYIARAAGAQSNwF-L9IrwZBlNl29sMkK9m-kKPQrcF-eOqdRc-bp2GTdGJJlMO4Hpy1qG1Wnk2vDwE7X9oOD6F8',
+          accessToken: 'ya29.a0AbVbY6PoWJ2LH8A12ti_sSH0Q9EezOWszn4iq0pSKGFQ4PbtcHv4wdLEUNE4l65_Lumll_CEofxiTC85nzOOZMDiFXe8KAIQ20CGcfeor5pxYHUkllayJpVHfFvI_EpLFZKLkapMgkVIDuGE05z6_NIS4AxtaCgYKAdISARESFQFWKvPlPV6bsxXyXyN3Tffa2kKvUw0163',
       },
-    });
-
-    
-  
-    let mailOptions = {
-      from: "boozleappcontact@gmail.com", //process.env.GMAIL_USER
-      to: email,
-      subject: 'Réinitialisation du mot de passe',
-      html: `
+  });
+  const mailOptions = {
+    from: 'boozleappcontact@gmail.com',
+    to: email, 
+    subject: 'Password Reset', // Subject line
+    html: `
                 <p>Bonjour,</p>
                 <p>Veuillez cliquer sur le lien ci-dessous pour réinitialiser votre mot de passe :</p>
-                <a href="http://votre_site_web/reset-password/${tokenMail}">Réinitialiser le mot de passe</a>
+                <a href="http://votre_site_web/reset-password/${token}">Réinitialiser le mot de passe</a>
                 <p>Ce lien expirera dans 1 heure.</p>
                 <p>Cordialement,</p>
                 <p>Votre équipe de support</p>
             `,
-    };
-  
-    try {
-      let info = await transporter.sendMail(mailOptions);
-      console.log(`Message sent: ${info.messageId}`);
-    } catch (error) {
-      console.log(`Error occurred. ${error.message}`);
-    }
-  }
+};
 
+transporter.sendMail(mailOptions, function (err, info) {
+    if(err)
+      console.log(err)
+    else
+      console.log(info);
+});
+
+  }
     function generateToken() {
         return new Promise((resolve, reject) => {
           crypto.randomBytes(48, function (err, buffer) {
