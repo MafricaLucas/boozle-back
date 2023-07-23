@@ -7,6 +7,7 @@ const { validateUser, validateLogin } = require('../validators');
 const { validationResult } = require('express-validator');
 const nodemailer = require('nodemailer');
 const { google } = require("googleapis");
+const OAuth2 = google.auth.OAuth2;
 
 require('dotenv').config();
 
@@ -192,67 +193,50 @@ router.post('/reset-password/:token', async (req, res) => {
 
 
   async function sendResetPasswordEmail(email, tokenMail) {
-    const OAuth2 = google.auth.OAuth2;
     const oauth2Client = new OAuth2(
       "392643971977-n41mmfqjajvt7kr09osprmcvk7vp9str.apps.googleusercontent.com", // ClientID
       "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", // Client Secret
       "https://developers.google.com/oauthplayground" // Redirect URL
     );
     
-    console.log('-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_');
-    console.log(oauth2Client);
     oauth2Client.setCredentials({
-      refresh_token: "1//043TkqAmXm3VLCgYIARAAGAQSNwF-L9IrcusykLxhHYW_vbNCm_9qCkLX4wIdaedNDhktGYLwIH7bvawSZ1lqOasOJLbnj0kfTJ4"
-    });
-    console.log('------------------------------');
-    console.log(oauth2Client);
-  
-    try {
-      const { token } = await oauth2Client.getAccessToken();
-      
-      console.log('------------------------------');
-      console.log(token);
-      const smtpTransport = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-            type: "OAuth2",
-            user: "boozleappcontact@gmail.com", 
-            clientId: '392643971977-n41mmfqjajvt7kr09osprmcvk7vp9str.apps.googleusercontent.com',
-            clientSecret: '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',
-            refreshToken: '1//043TkqAmXm3VLCgYIARAAGAQSNwF-L9IrcusykLxhHYW_vbNCm_9qCkLX4wIdaedNDhktGYLwIH7bvawSZ1lqOasOJLbnj0kfTJ4',
-            accessToken: token 
-        }
+      refresh_token: "1//04U_ANSsYz4tRCgYIARAAGAQSNwF-L9Ir-MdV3ukIGMxgQOK2EkW1Cfr8JjwoHIPcAYkdfV1ZP7Awyf2sMiJ4XR5BR1krKnILCBA"
     });
   
-    console.log('___________________________________');
-    console.log(smtpTransport);
-    const mailOptions = {
-      from: 'boozleappcontact@gmail.com',
-      to: email, 
-      subject: 'Password Reset', // Subject line
-      html: `
-                  <p>Bonjour,</p>
-                  <p>Veuillez cliquer sur le lien ci-dessous pour réinitialiser votre mot de passe :</p>
-                  <a href="http://votre_site_web/reset-password/${tokenMail}">Réinitialiser le mot de passe</a>
-                  <p>Ce lien expirera dans 1 heure.</p>
-                  <p>Cordialement,</p>
-                  <p>Votre équipe de support</p>
-              `,
-  };
-  
-  console.log('mailOptions', mailOptions);
-      smtpTransport.sendMail(mailOptions, function (err, info) {
-          if(err)
-            console.log(err)
-          else
-            console.log(info);
-      });
+    
+  const {token} = oauth2Client.getAccessToken();
+    const smtpTransport = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+          type: "OAuth2",
+          user: "boozleappcontact@gmail.com", 
+          clientId: '392643971977-n41mmfqjajvt7kr09osprmcvk7vp9str.apps.googleusercontent.com',
+          clientSecret: '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',
+          refreshToken: '1//04U_ANSsYz4tRCgYIARAAGAQSNwF-L9Ir-MdV3ukIGMxgQOK2EkW1Cfr8JjwoHIPcAYkdfV1ZP7Awyf2sMiJ4XR5BR1krKnILCBA',
+          accessToken: token 
+      }
+  });
 
-    } catch (error) {
-      console.error('Erreur lors de l\'obtention du token d\'accès:', error);
-    }
+  const mailOptions = {
+    from: 'boozleappcontact@gmail.com',
+    to: email, 
+    subject: 'Password Reset', // Subject line
+    html: `
+                <p>Bonjour,</p>
+                <p>Veuillez cliquer sur le lien ci-dessous pour réinitialiser votre mot de passe :</p>
+                <a href="http://votre_site_web/reset-password/${tokenMail}">Réinitialiser le mot de passe</a>
+                <p>Ce lien expirera dans 1 heure.</p>
+                <p>Cordialement,</p>
+                <p>Votre équipe de support</p>
+            `,
+};
 
-  
+smtpTransport.sendMail(mailOptions, function (err, info) {
+    if(err)
+      console.log(err)
+    else
+      console.log(info);
+});
 
   }
     function generateToken() {
