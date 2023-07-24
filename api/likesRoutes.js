@@ -1,13 +1,16 @@
 const express = require('express');
 const authenticate = require('../authenticate');
-const LikeService = require('./LikeService');
+const LikeService = require('../services/LikeService');
 
 const router = express.Router();
 const likeService = new LikeService();
 
 router.post('/add', authenticate, async (req, res) => {
     try {
-        const response = await likeService.addLike(req.user.id, req.body.gameId);
+        const response = await likeService.addLike(
+            req.user.id,
+            req.body.gameId
+        );
         res.json(response);
     } catch (err) {
         if (err.message === 'You have already liked this game.') {
@@ -20,7 +23,10 @@ router.post('/add', authenticate, async (req, res) => {
 
 router.post('/remove', authenticate, async (req, res) => {
     try {
-        const response = await likeService.removeLike(req.user.id, req.body.gameId);
+        const response = await likeService.removeLike(
+            req.user.id,
+            req.body.gameId
+        );
         res.json(response);
     } catch (err) {
         if (err.message === 'You have not liked this game yet.') {

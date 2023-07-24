@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const authenticate = require('../authenticate');
-const ProfileService = require('./ProfileService');
+const ProfileService = require('../services/ProfileService');
 
 function multerErrorHandling(err, req, res, next) {
     if (err instanceof multer.MulterError) {

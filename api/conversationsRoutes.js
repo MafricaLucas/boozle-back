@@ -1,6 +1,6 @@
 const express = require('express');
 const authenticate = require('../authenticate');
-const ConversationService = require('./ConversationService');
+const ConversationService = require('../services/ConversationService');
 
 const router = express.Router();
 const conversationService = new ConversationService();
