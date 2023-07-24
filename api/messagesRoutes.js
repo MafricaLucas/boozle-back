@@ -1,93 +1,54 @@
 const express = require('express');
-const pool = require('../database');
 const authenticate = require('../authenticate');
+const MessageService = require('../services/MessageService');
 require('dotenv').config();
 
 const router = express.Router();
+const messageService = new MessageService();
 
 router.post('/', authenticate, async (req, res) => {
-    let conn;
     try {
-        conn = await pool.getConnection();
-        const { conversationId, message } = req.body;
-
-        await conn.query(
-            'INSERT INTO Messages (ConversationId, SenderId, Message, TimeStamp, IsRead) VALUES (?, ?, ?, ?, ?)',
-            [conversationId, req.user.id, message, new Date(), 0]
+        const response = await messageService.sendMessage(
+            req.user.id,
+            req.body.conversationId,
+            req.body.message
         );
-
-        // Mark all other unread messages in the conversation as read
-        await conn.query(
-            'UPDATE Messages SET IsRead = 1 WHERE ConversationId = ? AND SenderId != ? AND IsRead = 0',
-            [conversationId, req.user.id]
-        );
-
-        res.status(201).json({ message: 'Message sent successfully.' });
+        res.status(201).json(response);
     } catch (err) {
-        console.log(err);
-        res.status(500).json({ message: 'Server error.' });
-    } finally {
-        if (conn) conn.end();
+        res.status(500).json({ message: err.message });
     }
 });
 
 router.get('/unread', authenticate, async (req, res) => {
-    let conn;
     try {
-        conn = await pool.getConnection();
-
-        const unreadMessages = await conn.query(
-            'SELECT Messages.* FROM Messages ' +
-                'JOIN Conversations ON Messages.ConversationId = Conversations.Id ' +
-                'WHERE (Conversations.User1Id = ? OR Conversations.User2Id = ?) ' +
-                'AND Messages.SenderId != ? AND Messages.IsRead = 0 ' +
-                'ORDER BY Messages.TimeStamp DESC',
-            [req.user.id, req.user.id, req.user.id]
+        const unreadMessages = await messageService.getUnreadMessages(
+            req.user.id
         );
         res.json(unreadMessages);
     } catch (err) {
-        console.log(err);
-        res.status(500).json({ message: 'Server error.' });
-    } finally {
-        if (conn) conn.end();
+        res.status(500).json({ message: err.message });
     }
 });
 
 router.get('/:conversationId', authenticate, async (req, res) => {
-    let conn;
     try {
-        conn = await pool.getConnection();
-        const { conversationId } = req.params;
-
-        const rows = await conn.query(
-            'SELECT * FROM Messages WHERE ConversationId = ? ORDER BY TimeStamp DESC',
-            [conversationId]
+        const messages = await messageService.getMessagesFromConversation(
+            req.params.conversationId
         );
-        res.json(rows);
+        res.json(messages);
     } catch (err) {
-        console.log(err);
-        res.status(500).json({ message: 'Server error.' });
-    } finally {
-        if (conn) conn.end();
+        res.status(500).json({ message: err.message });
     }
 });
 
 router.put('/:messageId/read', authenticate, async (req, res) => {
-    let conn;
     try {
-        conn = await pool.getConnection();
-        const { messageId } = req.params;
-
-        await conn.query('UPDATE Messages SET IsRead = ? WHERE Id = ?', [
-            1,
-            messageId
-        ]);
-        res.json({ message: 'Message marked as read.' });
+        const response = await messageService.markMessageAsRead(
+            req.params.messageId
+        );
+        res.json(response);
     } catch (err) {
-        console.log(err);
-        res.status(500).json({ message: 'Server error.' });
-    } finally {
-        if (conn) conn.end();
+        res.status(500).json({ message: err.message });
     }
 });
 

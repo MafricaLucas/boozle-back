@@ -1,10 +1,7 @@
 const express = require('express');
-const pool = require('../database');
 const multer = require('multer');
-const fs = require('fs');
-const path = require('path');
-const sharp = require('sharp');
 const authenticate = require('../authenticate');
+const ProfileService = require('./ProfileService');
 
 function multerErrorHandling(err, req, res, next) {
     if (err instanceof multer.MulterError) {
@@ -18,7 +15,7 @@ function multerErrorHandling(err, req, res, next) {
 const upload = multer({
     dest: '/images',
     limits: {
-        fileSize: 5 * 1024 * 1024 // 5MB
+        fileSize: 5 * 1024 * 1024
     },
     fileFilter: (req, file, cb) => {
         if (!file.mimetype.startsWith('image/')) {
@@ -29,6 +26,7 @@ const upload = multer({
 });
 
 const router = express.Router();
+const profileService = new ProfileService();
 
 router.post(
     '/profileImage',
@@ -36,58 +34,18 @@ router.post(
     upload.single('image'),
     multerErrorHandling,
     async (req, res) => {
-        let conn;
         try {
-            conn = await pool.getConnection();
-            const { file } = req;
-
-            if (!file) {
-                return res.status(400).json({ message: 'No file provided.' });
-            }
-
-            // resize image and move to correct directory
-            const newFilename = `/app/images/${file.filename}`;
-            await sharp(file.path)
-                .resize(720, 720, {
-                    fit: 'inside', // maintain aspect ratio
-                    withoutEnlargement: true // avoid enlarging smaller images
-                })
-                .toFile(newFilename); // path where resized image is saved
-
-            // Delete original uploaded image from tmp directory
-            fs.unlink(path.join('/app/images', file.path), (err) => {
-                if (err) console.log(err);
-            });
-
-            // Get the old image url.
-            const [user] = await conn.query(
-                'SELECT ProfileImageUrl FROM Users WHERE Id = ?',
-                [req.user.id]
+            const response = await profileService.uploadImage(
+                req.user.id,
+                req.file
             );
-            const oldImageUrl = user ? user.ProfileImageUrl : null;
-
-            // Update the user's profile image URL in the database.
-            await conn.query(
-                'UPDATE Users SET ProfileImageUrl = ? WHERE Id = ?',
-                [newFilename, req.user.id]
-            );
-
-            // If an old image exists, delete it.
-            if (oldImageUrl) {
-                fs.unlink(oldImageUrl, (err) => {
-                    if (err) console.log('Error deleting file:', err);
-                });
-            }
-
-            res.json({ message: 'Image uploaded successfully.' });
+            res.json(response);
         } catch (err) {
-            console.log(err);
-            res.status(500).json({
-                message:
-                    'An error occurred while processing your request. Please try again later.'
-            });
-        } finally {
-            if (conn) conn.end();
+            if (err.message === 'No file provided.') {
+                res.status(400).json({ message: err.message });
+            } else {
+                res.status(500).json({ message: 'Server error.' });
+            }
         }
     }
 );
