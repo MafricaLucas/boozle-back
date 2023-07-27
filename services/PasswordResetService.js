@@ -74,7 +74,10 @@ class PasswordResetService {
                 [user.Id]
             );
 
-            res.json({ message: 'Password reset successfully.' });
+            res.json({
+                status: 201,
+                message: 'Password reset successfully.'
+            });
         } catch (err) {
             console.log(err);
             res.status(500).json({ message: 'Server error.' });
