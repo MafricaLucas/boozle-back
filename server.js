@@ -3,7 +3,7 @@ const routes = require('./routes');
 var cors = require('cors');
 
 var corsOptions = {
-    origin: 'http://boozle.lucas-mafrica.fr',
+    origin: 'https://boozle.lucas-mafrica.fr',
     optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 
