@@ -102,7 +102,7 @@ class PasswordResetService {
             html: `
                       <p>Bonjour,</p>
                       <p>Veuillez cliquer sur le lien ci-dessous pour réinitialiser votre mot de passe :</p>
-                      <a href="http://51.255.50.74:86/reset-password/${token}">Réinitialiser le mot de passe</a>
+                      <a href="https://boozle.lucas-mafrica.fr/reset-password/${token}">Réinitialiser le mot de passe</a>
                       <p>Ce lien expirera dans 1 heure.</p>
                       <p>Cordialement,</p>
                       <p>Votre équipe de support</p>
